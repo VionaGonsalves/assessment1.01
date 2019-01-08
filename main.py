@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, flash, redirect, session, url
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 
-
+# Connecting to database
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:viona@localhost/assessment1.0'
 app.config['SECRET_KEY'] = 'vionag'
@@ -39,12 +39,14 @@ class Classes(db.Model):
         self.class_name = class_name
 
 
+# Displaying Student Details
 @app.route('/', methods=['GET', 'POST'])
 def show_all():
     db.create_all()
     return render_template('student_table.html', students=Student.query.all())
 
 
+# Adding a new student record
 @app.route('/new_student', methods=['GET', 'POST'])
 def new_student():
     if request.method == 'POST':
@@ -71,6 +73,7 @@ def new_student():
     return render_template('new_record.html', classes=Classes.query.all())
 
 
+# Adding a new class record
 @app.route('/new_class_record', methods=['GET', 'POST'])
 def new_class_record():
     if request.method == 'POST':
@@ -84,11 +87,13 @@ def new_class_record():
     return render_template('new_class.html', classes=Classes.query.all())
 
 
+# Displaying class details
 @app.route('/class_table', methods=['GET', 'POST'])
 def class_table():
     return render_template('class_table.html', classes=Classes.query.all())
 
 
+# Passing student details to be updated
 @app.route('/update', methods=['POST'])
 def update():
     if request.method == 'POST':
@@ -97,6 +102,7 @@ def update():
         return render_template('update.html', student=student)
 
 
+# Updating student record
 @app.route('/update_rec', methods=['POST'])
 def update_rec():
     if not request.form['name'] or not request.form['class_id']:
@@ -129,6 +135,7 @@ def update_rec():
     return render_template('student_table.html', students=Student.query.all(), classes=Classes.query.all())
 
 
+# Deleting student record
 @app.route('/delete_student', methods=['POST'])
 def delete_student():
     if request.method == 'POST':
