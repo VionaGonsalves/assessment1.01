@@ -1,24 +1,26 @@
-from flask import Flask, render_template, request, flash, redirect, session, url_for
+""" CRUD Operations"""
+from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 
 # Connecting to database
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:viona@localhost/assessment1.0'
-app.config['SECRET_KEY'] = 'vionag'
+APP = Flask(__name__)
+APP.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:viona@localhost/assessment1.0'
+APP.config['SECRET_KEY'] = 'vionag'
 
-db = SQLAlchemy(app)
+DB = SQLAlchemy(APP)
 
 
 # Creating Student entity
-class Student(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
+class Student(DB.Model): # pylint: disable=too-few-public-methods
+    """Creating Student Entity"""
+    id = DB.Column(DB.Integer, primary_key=True)
+    name = DB.Column(DB.String(100))
     # Foreign Key
-    class_id = db.Column(db.Integer, db.ForeignKey('classes.class_id'))
-    created_on = db.Column(db.DateTime(), server_default=db.func.now())
-    updated_on = db.Column(db.DateTime(), server_default=db.func.now())
-    classes = db.relationship('Classes', foreign_keys='Classes.class_leader')
+    class_id = DB.Column(DB.Integer, DB.ForeignKey('classes.class_id'))
+    created_on = DB.Column(DB.DateTime(), server_default=DB.func.now())
+    updated_on = DB.Column(DB.DateTime(), server_default=DB.func.now())
+    classes = DB.relationship('Classes', foreign_keys='Classes.class_leader')
 
     def __init__(self, name, class_id):
         self.name = name
@@ -26,31 +28,35 @@ class Student(db.Model):
 
 
 # Creating Class entity
-class Classes(db.Model):
-    class_id = db.Column(db.Integer, primary_key=True)
-    class_name = db.Column(db.String(100))
+class Classes(DB.Model): # pylint: disable=too-few-public-methods
+    """Creating Class Entity"""
+    class_id = DB.Column(DB.Integer, primary_key=True)
+    class_name = DB.Column(DB.String(100))
     # Foreign Key
-    class_leader = db.Column(db.Integer, db.ForeignKey('student.id'))
-    created_on = db.Column(db.DateTime(), server_default=db.func.now())
-    updated_on = db.Column(db.DateTime(), server_default=db.func.now())
-    student = db.relationship('Student', foreign_keys='Student.class_id')
+    class_leader = DB.Column(DB.Integer, DB.ForeignKey('student.id'))
+    created_on = DB.Column(DB.DateTime(), server_default=DB.func.now())
+    updated_on = DB.Column(DB.DateTime(), server_default=DB.func.now())
+    student = DB.relationship('Student', foreign_keys='Student.class_id')
 
     def __init__(self, class_name):
         self.class_name = class_name
 
 
 # Displaying Student Details
-@app.route('/', methods=['GET', 'POST'])
+@APP.route('/', methods=['GET', 'POST'])
 def show_all():
-    db.create_all()
+    """Displaying Student Details"""
+    DB.create_all()
     return render_template('student_table.html', students=Student.query.all())
 
 
 # Adding a new student record
-@app.route('/new_student', methods=['GET', 'POST'])
+@APP.route('/new_student', methods=['GET', 'POST'])
 def new_student():
+    """Adding new student record"""
     if request.method == 'POST':
-        if not request.form['name'] or not request.form['class_id'] or not request.form['class_leader']:
+        if not request.form['name'] or\
+                not request.form['class_id'] or not request.form['class_leader']:
             flash('Please enter all fields', 'error')
         else:
             class_leader = request.form['class_leader']
@@ -58,92 +64,99 @@ def new_student():
                 student = Student(request.form['name'], request.form['class_id'])
                 class_details = Classes.query.filter_by(class_id=request.form['class_id']).first()
 
-                db.session.add(student)
-                db.session.commit()
+                DB.session.add(student)
+                DB.session.commit()
 
                 class_details.class_leader = student.id
-                class_details.updated_on = db.func.now()
-                db.session.add(class_details)
-                db.session.commit()
+                class_details.updated_on = DB.func.now()
+                DB.session.add(class_details)
+                DB.session.commit()
             else:
                 student = Student(request.form['name'], request.form['class_id'])
-                db.session.add(student)
-                db.session.commit()
+                DB.session.add(student)
+                DB.session.commit()
             return redirect(url_for('show_all'))
     return render_template('new_record.html', classes=Classes.query.all())
 
 
 # Adding a new class record
-@app.route('/new_class_record', methods=['GET', 'POST'])
+@APP.route('/new_class_record', methods=['GET', 'POST'])
 def new_class_record():
+    """Adding a new class record"""
     if request.method == 'POST':
         if not request.form['class_name']:
             flash('Please enter all details', 'error')
         else:
             class_info = Classes(request.form['class_name'])
-            db.session.add(class_info)
-            db.session.commit()
+            DB.session.add(class_info)
+            DB.session.commit()
             return redirect(url_for('class_table'))
     return render_template('new_class.html', classes=Classes.query.all())
 
 
 # Displaying class details
-@app.route('/class_table', methods=['GET', 'POST'])
+@APP.route('/class_table', methods=['GET', 'POST'])
 def class_table():
+    """Displaying class details"""
     return render_template('class_table.html', classes=Classes.query.all())
 
 
 # Passing student details to be updated
-@app.route('/update', methods=['POST'])
+@APP.route('/update', methods=['POST'])
 def update():
+    """Passing student details to be updated"""
     if request.method == 'POST':
-        id = request.form.get('id')
-        student = Student.query.filter_by(id=id).first()
+        student_id = request.form.get('id')
+        student = Student.query.filter_by(id=student_id).first()
         return render_template('update.html', student=student)
+    return redirect(url_for(show_all))
 
 
 # Updating student record
-@app.route('/update_rec', methods=['POST'])
+@APP.route('/update_rec', methods=['POST'])
 def update_rec():
+    """Updating student record"""
     if not request.form['name'] or not request.form['class_id']:
         flash('Please enter all the fields', 'error')
     else:
         class_leader = request.form['class_leader']
         if class_leader == 'Yes':
-            id = request.form.get('id')
-            student = Student.query.filter_by(id=id).first()
+            student_id = request.form.get('id')
+            student = Student.query.filter_by(id=student_id).first()
             class_details = Classes.query.filter_by(class_id=request.form['class_id']).first()
             print(student.name)
             student.name = request.form['name']
             student.class_id = request.form['class_id']
-            student.updated_on = db.func.now()
+            student.updated_on = DB.func.now()
 
             class_details.class_leader = student.id
             class_details.updated_on = student.updated_on
             print(class_details.class_leader)
-            db.session.commit()
+            DB.session.commit()
 
         else:
-            id = request.form.get('id')
-            student = Student.query.filter_by(id=id).first()
+            student_id = request.form.get('id')
+            student = Student.query.filter_by(id=student_id).first()
             student.name = request.form['name']
             student.class_id = request.form['class_id']
-            student.updated_on = db.func.now()
+            student.updated_on = DB.func.now()
 
-            db.session.commit()
+            DB.session.commit()
 
-    return render_template('student_table.html', students=Student.query.all(), classes=Classes.query.all())
+    return render_template('student_table.html', students=Student.query.all(),
+                           classes=Classes.query.all())
 
 
 # Deleting student record
-@app.route('/delete_student', methods=['POST'])
+@APP.route('/delete_student', methods=['POST'])
 def delete_student():
+    """Deleting student record"""
     if request.method == 'POST':
         student_id = request.form.get('id')
         student = Student.query.filter_by(id=student_id).first()
     try:
-        db.session.delete(student)
-        db.session.commit()
+        DB.session.delete(student)
+        DB.session.commit()
         return render_template('student_table.html', students=Student.query.all())
     except IntegrityError:
         flash('The student you are trying to delete is the current class leader.'
@@ -152,6 +165,5 @@ def delete_student():
 
 
 if __name__ == '__main__':
-    db.create_all()
-    app.run(debug='True')
-
+    DB.create_all()
+    APP.run(debug='True')
