@@ -3,23 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 </head>
 <body>
+<center>
+<h3>Update Student Details</h3><hr>
+    {% for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            {{ message }}
+         </div>
+      {% endfor %}
 <form action = "./update_rec", method = "post">
-    <label>Enter Name</label>
-    <input type="hidden", name="id" value="{{student.id}}">
-    <input type="text", name="name">
+    <label>Enter Name</label>&nbsp;&nbsp;&nbsp;
+    <input type="hidden", name="id" value="{{student.student_id}}">
+    <input type="text", name="name" value="{{student.name}}"><br>
     <label>Enter Class Id</label>
     <input type="hidden", name="old_class_id" value="{{student.class_id}}">
-    <input type="text", name="class_id">
+    <input type="text", name="class_id" value="{{student.class_id}}"><br>
     <label>Appoint as Class Leader?</label>
     <select name="class_leader">
         <option name="Yes">Yes</option>
         <option name="No">No</option>
-    </select>
-    <input type="submit", value = "Submit">
-
+    </select><br><br>
+    <input type="submit", value = "Submit" class="btn btn-primary">
 </form>
-
+</center>
 </body>
 </html>

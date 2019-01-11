@@ -23,16 +23,19 @@ def test_home(test_resp_code):
     assert resp.status_code == 200
 
 
-dict_new_student = {"name": "Donson", "class_id": 1, "class_leader": "Yes"}
-dict_new_student2 = {"name": "Sean", "class_id": 2, "class_leader": "No"}
+dict_new_student = {"name": "Donson", "class_id": "334362524032507595502370532083679504284", "class_leader": "Yes"}
+dict_new_student2 = {"name": "Sean", "class_id": "59369352943334187764735699285760419740", "class_leader": "No"}
 
 dict_new_class = {"class_name": "BE IT"}
 
-dict_update = {"id": 15, "name": "Sydney", "class_id": 1, "class_leader": "Yes"}
-dict_update2 = {"id": 16, "name": "Sydney", "class_id": 1, "class_leader": "No"}
+dict_update = {"id": "3564711771943327061460740174056138652", "name": "Sydney",
+               "class_id": "59369352943334187764735699285760419740",
+               "class_leader": "Yes"}
+dict_update2 = {"id": "12654194566113633927053509605750613916", "name": "Sydney",
+                "class_id": "59369352943334187764735699285760419740", "class_leader": "No"}
 
 
-dict_delete = {"id": 29}
+dict_delete = {"id": "181059901130796733222743252984573077404"}
 
 
 def test_new_student(test_resp_code):
