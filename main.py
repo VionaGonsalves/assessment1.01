@@ -1,11 +1,12 @@
 """ CRUD Operations"""
+import uuid
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
-import uuid
 
-# Connecting to database
+
 APP = Flask(__name__)
+# Connecting to database
 APP.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:viona@localhost/assessment1.0'
 APP.config['SECRET_KEY'] = 'vionag'
 
