@@ -10,5 +10,6 @@ test:
 	coverage report main.py
 
 db:
-	alembic revision --autogenerate
+	alembic upgrade 2edb6d0fc975
+
 
