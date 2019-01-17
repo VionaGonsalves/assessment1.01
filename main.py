@@ -2,7 +2,6 @@
 import uuid
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.exc import IntegrityError
 
 
 APP = Flask(__name__)
@@ -170,7 +169,7 @@ def delete_student():
         if class_details.class_leader == student.student_id:
             flash('The student you are trying to delete is the current class leader.'
                   'Please appoint a new class leader')
-            return render_template('student_table.html', students=Student.query.all())
+
         else:
             DB.session.delete(student)
             DB.session.commit()
