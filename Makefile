@@ -10,4 +10,5 @@ test:
 	coverage report main.py
 
 db:
-	alembic upgrade head
+	alembic revision --autogenerate
+

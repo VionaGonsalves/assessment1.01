@@ -146,8 +146,10 @@ def update_rec():
         else:
             student_id = request.form.get('id')
             student = Student.query.filter_by(student_id=student_id).first()
+            class_details = Classes.query.filter_by(class_id=request.form['class_id']).first()
             student.name = request.form['name']
             student.class_id = request.form['class_id']
+            class_details.class_leader = None
             student.updated_on = DB.func.now()
 
             DB.session.commit()
@@ -163,15 +165,19 @@ def delete_student():
     if request.method == 'POST':
         student_id = request.form.get('id')
         student = Student.query.filter_by(student_id=student_id).first()
-    try:
-        DB.session.delete(student)
-        DB.session.commit()
-        flash('Student Deleted Successfully!')
-        return render_template('student_table.html', students=Student.query.all())
-    except IntegrityError:
-        flash('The student you are trying to delete is the current class leader.'
-              'Please appoint a new class leader')
-        return render_template('student_table.html', students=Student.query.all())
+        class_details = Classes.query.filter_by(class_id=student.class_id).first()
+
+        if class_details.class_leader == student.student_id:
+            flash('The student you are trying to delete is the current class leader.'
+                  'Please appoint a new class leader')
+            return render_template('student_table.html', students=Student.query.all())
+        else:
+            DB.session.delete(student)
+            DB.session.commit()
+            flash('Student Deleted Successfully!')
+    return render_template('student_table.html', students=Student.query.all())
+
+
 
 
 if __name__ == '__main__':

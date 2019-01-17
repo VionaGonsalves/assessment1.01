@@ -18,12 +18,12 @@
 <form action="{{ request.path }}", method="post">
     <label for="name">Enter Student Name:</label>
     <input type="text", name="name", placeholder="Name"><br>
-    <label for="class ID">&nbsp;&nbsp;&nbsp;&nbsp;Class ID:</label>
+    <label for="class ID">&nbsp;&nbsp;&nbsp;&nbsp;Class:</label>
     <select name="class_id">
    {% for class in classes %}
      <option value="{{class.class_id}}">
 
-      {{class.class_name}} - {{class.class_id}}
+      {{class.class_name}}
 
     </option>
    {% endfor %}
